@@ -20,7 +20,10 @@ class Solution {
 //        root.right.right = new TreeNode(3);
 //        System.out.println(isSymmetric(root));
         //System.out.println(camelCaseSeparation(new String[]{"is","valid","right"}, "isValid"));
-        System.out.println(sumsDivisibleByK(new int[]{0,2,3,4,6}, 3));
+        //System.out.println(sumsDivisibleByK(new int[]{0,2,3,4,6}, 3));
+        //System.out.println(merge(new int[]{1,4,7,8,0,0,0}, 4, new int[]{1,2,3}, 3));
+//        System.out.println(countChars("aabbbaaacccccddcc"));
+        System.out.println(trippleSum(new int[]{1, 4, 7, 8, 2, 5, 3}));
     }
 
     /*
@@ -482,6 +485,150 @@ Your algorithms should work for assuming there can be n elements in the array
                 htb.add(item);
         }
         return count;
+    }
+
+    /*
+    arr1 = {1, 4, 7, 8, 0, 0, 0} --> m items are not zero, arr1 size = m + n
+	arr2 = {2, 4, 6} --> size is n
+	-> Merge arr2 into arr1, use in place
+     */
+    static int[] merge(int[] arr1, int m, int[] arr2, int n) {
+        int i = m - 1;
+        int j = n - 1;
+        int pos = arr1.length - 1;
+        while(i >= 0 || j >= 0) {
+            if(i < 0) {
+                arr1[pos] = arr2[j];
+                j--;
+            }
+            else if(j < 0) {
+                arr1[pos] = arr1[i];
+                i--;
+            }
+            else if(arr1[i] > arr2[j]) {
+                arr1[pos] = arr1[i];
+                i--;
+            }
+            else {
+                arr1[pos] = arr2[j];
+                j--;
+            }
+            pos--;
+        }
+        return arr1;
+    }
+
+    /*
+    String: aabbbaaacccccdcc, count by 1 if character repeat sequence more than 1
+	-> 	a: 2
+		b: 1
+		c: 2
+     */
+    static HashMap<Character, Integer> countChars(String s) {
+        HashMap<Character, Integer> hashMap = new HashMap<>();
+        if(s.length() <= 1)
+            return hashMap;
+        int i = 0;
+        int j = 1;
+        while(i < s.length() - 1){
+            Character c = s.charAt(i);
+            if(j <= s.length() - 1 && c == s.charAt(j)){
+                j++;
+            } else {
+                if(j - i >= 2) {
+                    if(hashMap.containsKey(c))
+                        hashMap.replace(c, hashMap.get(c) + 1);
+                    else
+                        hashMap.put(c, 1);
+                }
+                i = j;
+                j = i + 1;
+            }
+        }
+        return hashMap;
+    }
+
+    /*
+    TwoSum: arr1 = {1, 4, 7, 8, 2, 5, 3}, target = 10 => (7, 3), (8, 2)
+     */
+    static List<List<Integer>> twoSum(int[] arr1, int target){
+        List<List<Integer>> list = new ArrayList<>();
+        if(arr1 == null)
+            return null;
+        HashSet<Integer> hashSet = new HashSet<>();
+        for(int i = 0; i < arr1.length; i++) {
+            if(hashSet.contains(target - arr1[i])){
+                List<Integer> l = new ArrayList<>();
+                l.add(target - arr1[i]);
+                l.add(arr1[i]);
+                list.add(l);
+            }
+            if(!hashSet.contains(arr1[i]))
+                hashSet.add(arr1[i]);
+        }
+        return list;
+    }
+
+    /*
+    TrippleSum
+	arr1 = {1, 4, 7, 8, 2, 5, 3}
+	-> (1, 4, 5), (1, 3, 4), (1, 7, 8) (2, 3, 5), etc.
+     */
+    static List<List<Integer>> trippleSum(int[] arr1){
+        List<List<Integer>> list = new ArrayList<>();
+        if(arr1 == null)
+            return null;
+        for(int i = 0; i < arr1.length; i++) {
+            List<List<Integer>> l = twoSum2(arr1, i);
+            if(l != null) {
+                list.addAll(l);
+            }
+        }
+        return list;
+    }
+    static List<List<Integer>> twoSum2(int[] arr1, int indexTarget){
+        List<List<Integer>> list = new ArrayList<>();
+        if(arr1 == null)
+            return null;
+        int target = arr1[indexTarget];
+        HashSet<Integer> hashSet = new HashSet<>();
+        for(int i = 0; i < arr1.length; i++) {
+            if(i == indexTarget)
+                continue;
+            if(hashSet.contains(target - arr1[i])){
+                List<Integer> l = new ArrayList<>();
+                l.add(target - arr1[i]);
+                l.add(arr1[i]);
+                l.add(target);
+                list.add(l);
+            }
+            if(!hashSet.contains(arr1[i]))
+                hashSet.add(arr1[i]);
+        }
+        return list;
+    }
+
+    /*
+    2 sorted LinkedList
+	-> combine these two linkedList
+     */
+    static LinkedList<Integer> mergeLinkedList(LinkedList<Integer> linkedList1, LinkedList<Integer> linkedList2) {
+        if(linkedList1 == null)
+            return linkedList2;
+        if(linkedList2 == null)
+            return linkedList1;
+        LinkedList<Integer> list = new LinkedList<>();
+        while(linkedList1.size() > 0 || linkedList2.size() > 0) {
+            if(linkedList1.size() == 0)
+                list.add(linkedList2.poll());
+            else if(linkedList2.size() == 0)
+                list.add(linkedList1.poll());
+            else if(linkedList1.peek() >= linkedList2.peek())
+                list.add(linkedList2.poll());
+            else
+                list.add(linkedList1.poll());
+        }
+        return list;
     }
 }
 
