@@ -9,9 +9,18 @@ import java.util.*;
 class Solution {
 
     public static void main(String[] args){
-        System.out.println(isPalindrome("race Car"));
+        //System.out.println(isPalindrome("race Car"));
 //        System.out.println(permute("abc"));
-        duplicateZeros(new int[] {0,4,1,0,0,8,0,0,3});
+//        TreeNode root = new TreeNode(1);
+//        root.left = new TreeNode(2);
+//        root.left.left = new TreeNode(3);
+//        root.left.right = new TreeNode(4);
+//        root.right = new TreeNode(2);
+//        root.right.left = new TreeNode(4);
+//        root.right.right = new TreeNode(3);
+//        System.out.println(isSymmetric(root));
+        //System.out.println(camelCaseSeparation(new String[]{"is","valid","right"}, "isValid"));
+        System.out.println(sumsDivisibleByK(new int[]{0,2,3,4,6}, 3));
     }
 
     /*
@@ -99,7 +108,7 @@ Your algorithms should work for assuming there can be n elements in the array
     Output : Length of LIS = 4
     The longest increasing subsequence is {3, 7, 40, 80}
      */
-    private static int longestIncreaseingSubsequence(int[] arr) {
+    private static int longestIncreasingSubsequence(int[] arr) {
         int longest = 1;
         if(arr.length <= 1)
             return arr.length;
@@ -273,23 +282,42 @@ Your algorithms should work for assuming there can be n elements in the array
         }
     }
 
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        List<List<Integer>> rs = new ArrayList<>();
+        if(root == null)
+            return rs;
+        Deque<TreeNode> queue = new ArrayDeque<>();
+        queue.offer(root);
+        while(queue.size() > 0) {
+            int size = queue.size();
+            List<Integer> list = new ArrayList<>();
+            for(int i = 0; i < size; i++) {
+                TreeNode node = queue.poll();
+                list.add(node.val);
+                if(node.left != null)
+                    queue.offer(node.left);
+                if(node.right != null)
+                    queue.offer(node.right);
+            }
+            rs.add(list);
+        }
+        return rs;
+    }
+
     public static List<Integer> preorderTraversal(TreeNode root) {
         List<Integer> list = new ArrayList<>();
         if(root == null)
             return list;
-        Deque<TreeNode> deque = new ArrayDeque<>();
-        deque.offer(root);
-        while(deque.size() > 0) {
-            TreeNode node = deque.poll();
-            if(node != null) {
-                list.add(node.val);
-            }
-            if(node.right != null)
-                deque.offerFirst(node.right);
-            if(node.left != null)
-                deque.offerFirst(node.left);
-        }
+        preorderTraversal(root, list);
         return list;
+    }
+
+    public static void preorderTraversal(TreeNode root, List<Integer> list) {
+        list.add(root.val);
+        if(root.left != null)
+            preorderTraversal(root.left, list);
+        if(root.right != null)
+            preorderTraversal(root.right, list);
     }
 
     public static List<Integer> inorderTraversal(TreeNode root) {
@@ -306,6 +334,154 @@ Your algorithms should work for assuming there can be n elements in the array
         list.add(root.val);
         if(root.right != null)
             inorderTraversal(root.right, list);
+    }
+
+    public static List<Integer> postorderTraversal(TreeNode root) {
+        List<Integer> list = new ArrayList<>();
+        if(root == null)
+            return list;
+        postorderTraversal(root, list);
+        return list;
+    }
+
+    private static void postorderTraversal(TreeNode root, List<Integer> list) {
+        if(root.left != null)
+            postorderTraversal(root.left, list);
+        if(root.right != null)
+            postorderTraversal(root.right, list);
+        list.add(root.val);
+    }
+
+    public static int maxDepth(TreeNode root) {
+        if(root != null)
+            maxDepth(root, 1);
+        return max;
+    }
+    static int max = 0;
+    public static void maxDepth(TreeNode root, int depth) {
+        if(root.left == null && root.right == null)
+            max = Math.max(max, depth);
+        if(root.left != null)
+            maxDepth(root.left, depth + 1);
+        if(root.right != null)
+            maxDepth(root.right, depth + 1);
+    }
+
+    public static boolean isSymmetric(TreeNode root) {
+        if(root == null || (root.left == null && root.right == null))
+            return true;
+        return compare(root.left, root.right);
+    }
+    public static boolean compare(TreeNode left, TreeNode right) {
+        if(left == null && right == null)
+            return true;
+        if(left == null && right != null)
+            return false;
+        if(left != null && right == null)
+            return false;
+        if(left.val != right.val)
+            return false;
+        return compare(left.left, right.right) && compare(left.right, right.left);
+    }
+    public static boolean compareIterate(TreeNode left, TreeNode right) {
+        List<TreeNode> list = new ArrayList<>();
+        if(left != null)
+            list.add(left);
+        if(right != null)
+            list.add(right);
+        while(list.size() > 0) {
+            int size = list.size();
+            if(size % 2 == 1)
+                return false;
+            for(int i = 0; i < size / 2; i++) {
+                TreeNode nodeLeft = list.get(i);
+                TreeNode nodeRight = list.get(size - i - 1);
+                if(nodeLeft != null && nodeRight != null && nodeLeft.val != nodeRight.val)
+                    return false;
+                if(nodeLeft == null & nodeRight != null)
+                    return false;
+                if(nodeLeft != null & nodeRight == null)
+                    return false;
+            }
+            for(int i = 0; i < size; i++) {
+                TreeNode n = list.get(0);
+                if(n != null) {
+                    list.add(n.left);
+                    list.add(n.right);
+                }
+                list.remove(0);
+            }
+        }
+        return true;
+    }
+
+    public static boolean hasPathSum(TreeNode root, int targetSum) {
+        if(root == null)
+            return false;
+        sumPath(root, 0, targetSum);
+        return result;
+    }
+    static boolean result = false;
+    public static void sumPath(TreeNode root, int currSum, int targetSum) {
+        if(root.left == null && root.right == null) {
+            if(root.val + currSum == targetSum) {
+                result = true;
+            }
+            return;
+        }
+        if(root.left != null)
+            sumPath(root.left, currSum + root.val, targetSum);
+        if(root.right != null)
+            sumPath(root.right, currSum + root.val, targetSum);
+    }
+
+    static boolean camelCaseSeparation(String[] words, String variableName) {
+        return camelCaseSeparation(words, variableName, true);
+    }
+
+    static boolean camelCaseSeparation(String[] words, String variableName, boolean isPrefix) {
+        if(variableName.isEmpty())
+            return true;
+        String prefix = "";
+        for(int i = 0; i < words.length; i++){
+            if(words[i].length() > variableName.length())
+                continue;
+            String s = variableName.substring(0, words[i].length());
+            if(isPrefix){
+                if(s.toLowerCase().compareTo(words[i]) == 0){
+                    prefix = words[i];
+                    isPrefix = false;
+                    break;
+                }
+            } else {
+                if(s.compareTo(words[i].substring(0,1).toUpperCase() + words[i].substring(1)) == 0){
+                    prefix = words[i];
+                    break;
+                }
+            }
+        }
+        if(!prefix.isEmpty()) {
+            variableName = variableName.substring(prefix.length());
+            return camelCaseSeparation(words, variableName, isPrefix);
+        }
+        return false;
+    }
+
+    static long sumsDivisibleByK(int[] a, int k){
+        HashSet<Integer> htb = new HashSet<>();
+        long count = 0;
+        for(int i = 0; i < a.length; i++){
+            int item = a[i];
+            if(a[i] >= k)
+                item = a[i] % k;
+            if(item == 0 && htb.contains(0))
+                count++;
+            else if(htb.contains(k - item))
+                count++;
+            if(!htb.contains(item))
+                htb.add(item);
+        }
+        return count;
     }
 }
 
