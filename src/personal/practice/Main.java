@@ -1,6 +1,12 @@
 package personal.practice;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.SocketPermission;
+import java.net.URL;
+import java.net.URLConnection;
 import java.security.AccessController;
 import java.security.Permission;
 import java.sql.Timestamp;
@@ -8,7 +14,7 @@ import java.util.*;
 
 class Solution {
 
-    public static void main(String[] args){
+    public static void main(String[] args)  {
         //System.out.println(isPalindrome("race Car"));
 //        System.out.println(permute("abc"));
 //        TreeNode root = new TreeNode(1);
@@ -23,7 +29,15 @@ class Solution {
         //System.out.println(sumsDivisibleByK(new int[]{0,2,3,4,6}, 3));
         //System.out.println(merge(new int[]{1,4,7,8,0,0,0}, 4, new int[]{1,2,3}, 3));
 //        System.out.println(countChars("aabbbaaacccccddcc"));
-        System.out.println(trippleSum(new int[]{1, 4, 7, 8, 2, 5, 3}));
+//        System.out.println(trippleSum(new int[]{1, 4, 7, 8, 2, 5, 3}));
+//        URL oracle = new URL("http://www.google.com");
+//        URLConnection connection = oracle.openConnection();
+//        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+//        String inputLine;
+//        while((inputLine = in.readLine()) != null){
+//            System.out.println(inputLine);
+//        }
+//        in.close();
     }
 
     /*
@@ -659,3 +673,24 @@ class Node {
         next = null;
     }
 }
+
+//interface A {
+//    public void aaa();
+//}
+//abstract class AA implements A {
+//    public void bbb(){}
+//    class C extends AA implements A {
+//        public void aaa(){
+//            System.out.println("Hi");
+//        }
+//    }
+//}
+//public class Exa extends AA{
+//    public void aaa(){
+//        System.out.println("Bye");
+//    }
+//    public static void main(String args[]){
+//        A a = new AA();
+//        a.aaa();
+//    }
+//}
