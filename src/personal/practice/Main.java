@@ -11,20 +11,24 @@ import java.security.AccessController;
 import java.security.Permission;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.function.BinaryOperator;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 class Solution {
 
     public static void main(String[] args)  {
         //System.out.println(isPalindrome("race Car"));
 //        System.out.println(permute("abc"));
-//        TreeNode root = new TreeNode(1);
-//        root.left = new TreeNode(2);
-//        root.left.left = new TreeNode(3);
-//        root.left.right = new TreeNode(4);
-//        root.right = new TreeNode(2);
-//        root.right.left = new TreeNode(4);
-//        root.right.right = new TreeNode(3);
-//        System.out.println(isSymmetric(root));
+        TreeNode root = new TreeNode(1);
+        root.left = new TreeNode(2);
+        root.left.left = new TreeNode(3);
+        root.left.right = new TreeNode(4);
+        root.right = new TreeNode(5);
+        root.right.left = new TreeNode(6);
+        root.right.right = new TreeNode(7);
+        System.out.println(getAllPaths(root));
         //System.out.println(camelCaseSeparation(new String[]{"is","valid","right"}, "isValid"));
         //System.out.println(sumsDivisibleByK(new int[]{0,2,3,4,6}, 3));
         //System.out.println(merge(new int[]{1,4,7,8,0,0,0}, 4, new int[]{1,2,3}, 3));
@@ -38,8 +42,42 @@ class Solution {
 //            System.out.println(inputLine);
 //        }
 //        in.close();
+//        List<String> anagrams = new ArrayList<>();
+//        anagrams.add("Tar");
+//        anagrams.add("Rat");
+//        anagrams.add("Art");
+//        anagrams.add("Bat");
+//        anagrams.add("tab");
+//        System.out.println(groupAnagrams(anagrams));
+        String s = "aabbbcdef";
+        int count = 0;
+        Stream<String> characterStream = s.chars().mapToObj(c -> String.valueOf(c));
+        String rs = characterStream.reduce("", (c1, c2) -> "" + String.valueOf(c1) + String.valueOf(c2));
+//        characterStream.forEach(c -> {
+//            if(outputStr.length() == 0) {
+//                outputStr.append(c);
+//                charCount++;
+//            }
+//            else if(outputStr.lastIndexOf(c.toString()) == outputStr.length() - 1){
+//                charCount++;
+//            }
+//            else {
+//                outputStr.append(charCount);
+//                outputStr.append(c);
+//                charCount = 1;
+//            }
+//            if(pos == s.length() - 1){
+//                outputStr.append(charCount);
+//            }
+//            pos++;
+//        });
+//        System.out.println(outputStr.toString());
+//        System.out.println(getSum("23+++12#$#$1234;/.,10"));
+        System.out.println(rs);
     }
-
+    static int charCount = 0;
+    static int pos = 0;
+    static StringBuilder outputStr = new StringBuilder();
     /*
 Given an array of integers, return an
 list of integers which contains
@@ -87,7 +125,6 @@ Your algorithms should work for assuming there can be n elements in the array
         permute(str, 0, str.length() - 1, stringList);
         return stringList;
     }
-
     private static void permute(String str, int i, int j, List<String> stringList) {
         if(i == j) {
             stringList.add(str);
@@ -101,7 +138,6 @@ Your algorithms should work for assuming there can be n elements in the array
             }
         }
     }
-
     private static String swap(String s, int i, int j) {
         char temp;
         char[] charArray = s.toCharArray();
@@ -246,7 +282,7 @@ Your algorithms should work for assuming there can be n elements in the array
         List<Map.Entry<String, Integer> > list = new LinkedList<Map.Entry<String, Integer> >(hm.entrySet());
 
         // Sort the list
-        Collections.sort(list, new Comparator<Map.Entry<String, Integer> >() {
+        Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
             public int compare(Map.Entry<String, Integer> o1,
                                Map.Entry<String, Integer> o2)
             {
@@ -644,6 +680,132 @@ Your algorithms should work for assuming there can be n elements in the array
         }
         return list;
     }
+
+    public static char firstNonRepeated(String str) {
+        Map<Character,Integer> counts = new LinkedHashMap<>(str.length());
+
+        for (char c : str.toCharArray()) {
+            counts.put(c, counts.containsKey(c) ? counts.get(c) + 1 : 1);
+        }
+
+        for (Map.Entry<Character,Integer> entry : counts.entrySet()) {
+            if (entry.getValue() == 1) {
+                return entry.getKey();
+            }
+        }
+        return Character.MIN_VALUE;
+    }
+
+    /*
+    Given two integer arrays inorder and postorder where inorder is the inorder traversal of a binary tree and postorder is the postorder traversal of the same tree,
+     construct and return the binary tree.
+     Input: inorder = [9,3,15,20,7], postorder = [9,15,7,20,3]
+     Output: [3,9,20,null,null,15,7]
+     */
+    static HashMap<Integer, Integer> hashMap = new LinkedHashMap<>();
+    static int post_idx;
+    public static TreeNode buildTree(int[] inorder, int[] postorder) {
+        if(inorder == null || postorder == null)
+            return null;
+        for (int i = 0; i < inorder.length;i++){
+            hashMap.put(inorder[i], i);
+        }
+        post_idx = postorder.length - 1;
+        return buildTree(inorder, postorder, 0, postorder.length - 1);
+    }
+
+    public static TreeNode buildTree(int[] inorder, int[] postorder, int in_left, int post_right) {
+        if(in_left > post_right)
+            return null;
+        int root_val = postorder[post_idx--];
+        TreeNode root = new TreeNode(root_val);
+        int index = hashMap.get(root_val);
+        root.right = buildTree(inorder, postorder, index + 1, post_right);
+        root.left = buildTree(inorder, postorder, in_left, index - 1);
+        return root;
+    }
+
+    /*
+    Given two integer arrays preorder and inorder
+    where preorder is the preorder traversal of a binary tree and inorder is the inorder traversal of the same tree,
+    construct and return the binary tree.
+    Input: preorder = [3,9,20,15,7], inorder = [9,3,15,20,7]
+    Output: [3,9,20,null,null,15,7]
+    */
+    static int pre_index;
+    public static TreeNode buildTree1(int[] preorder, int[] inorder) {
+        if(preorder == null || inorder == null)
+            return null;
+        pre_index = 0;
+        for(int i = 0; i < inorder.length; i++){
+            hashMap.put(inorder[i], i);
+        }
+        return buildTree1(inorder, preorder, 0,0);
+    }
+    public static TreeNode buildTree1(int[] inorder, int[] preorder, int in_left, int in_right) {
+        if(in_left > in_right)
+            return null;
+        int root_val = preorder[pre_index++];
+        TreeNode root = new TreeNode(root_val);
+        int index = hashMap.get(root_val);
+        root.left = buildTree1(inorder, preorder, in_left, index - 1);
+        root.right = buildTree1(inorder, preorder, index + 1, in_right);
+        return root;
+    }
+
+    public static List<List<String>> groupAnagrams(List<String> strs) {
+        if (strs.size() == 0) return new ArrayList<>();
+        Map<String, List<String>> ans = new HashMap<>();
+        for (String s : strs) {
+            char[] ca = s.toLowerCase().toCharArray();
+            Arrays.sort(ca);
+            String key = String.valueOf(ca);
+            if (!ans.containsKey(key))
+                ans.put(key, new ArrayList<>());
+            ans.get(key).add(s);
+        }
+        return new ArrayList<>(ans.values());
+    }
+
+    public static List<List<Integer>>  getAllPaths(TreeNode root) {
+        List<List<Integer>> results = new ArrayList<>();
+        List<Integer> path = new ArrayList<>();
+        getAllPaths(results, path, root);
+        return results;
+    }
+    public static void getAllPaths(List<List<Integer>> results, List<Integer> path, TreeNode root) {
+        path.add(root.val);
+        if(root.left == null && root.right == null) {
+            results.add(path);
+            return;
+        }
+        List<Integer> pLeft = new ArrayList<>(path);
+        getAllPaths(results, pLeft, root.left);
+        List<Integer> pRight = new ArrayList<>(path);
+        getAllPaths(results, pRight, root.right);
+    }
+
+    public static int getSum(String str){
+        int sum = 0;
+        String num = "";
+        for(int i = 0; i < str.length(); i++) {
+            if(Character.isDigit(str.charAt(i))) {
+                num += str.charAt(i);
+            }
+            else if(str.charAt(i) == '-' && num == ""){
+                num += "-";
+            }
+            else {
+                if(num.length() > 0 && num != "-") {
+                    sum += Integer.parseInt(num);
+                    num = "";
+                }
+            }
+        }
+        if(!num.isEmpty() && num != "-")
+            sum += Integer.parseInt(num);
+        return sum;
+    }
 }
 
 /**
@@ -694,3 +856,20 @@ class Node {
 //        a.aaa();
 //    }
 //}
+
+class DemoExample {
+    public static void main(String[] args) {
+
+    }
+}
+
+class ThreadDemo extends Thread {
+    @Override
+    public synchronized void start(){
+
+    }
+    @Override
+    public void run(){
+
+    }
+}
